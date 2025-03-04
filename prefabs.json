@@ -1,0 +1,59 @@
+{
+    "cells": [
+        {
+            "symbol": "x",
+            "name": "Wall",
+            "isTraversable": false
+        },
+        {
+            "symbol": " ",
+            "name": "Free space",
+            "isTraversable": true
+        },
+        {
+            "symbol": null,
+            "name": "Void",
+            "isTraversable": false
+        }
+    ],
+    "rooms": [
+        {
+            "name": "VerticalCorridor",
+            "map": [
+                [
+                    "x",
+                    " ",
+                    "x"
+                ]
+            ]
+        },
+        {
+            "name": "CrossCorridor",
+            "map": [
+                [
+                    "x",
+                    " ",
+                    "x"
+                ],
+                [
+                    " ",
+                    " ",
+                    " "
+                ],
+                [
+                    "x",
+                    " ",
+                    "x"
+                ]
+            ]
+        },
+        {
+            "name": "VoidUnit",
+            "map": [
+                [
+                    null
+                ]
+            ]
+        }
+    ]
+}
