@@ -7,6 +7,7 @@ import json
 from cell import Cell
 
 # endregion
+
 # region load config
 with open(sys.argv[2], "r") as file:
     data = json.load(file)
@@ -18,19 +19,35 @@ for cellType in data["cells"]:
     )
 # print(cellTypes)
 
-maxY = 0
-maxX = 0
+gridHeight = 0
+gridLength = 0
 grid = []
 with open(sys.argv[1], "r") as file:
     for line in file:
-        grid.append([])
-        maxX = min(maxX or len(line), len(line))
-        x = 0
-        for char in line:
-            if char != "\n":
-                grid[maxY].append(cellTypes[char])
-                x += 1
-        maxX = x
-        maxY += 1
+        line = line.rstrip("\n")
+        grid.append([cellTypes[char] for char in line])
+        if gridLength == 0:
+            gridLength = len(line)
+        gridHeight += 1
 # print(grid)
+# endregion
+
+# region solver base rule setup
+solver = Solver()
+variables = {}
+constraints = []
+
+for i in range(gridHeight):
+    for j in range(gridLength):
+        variables[f"{i}x{j}"] = Int(f"{i}x{j}")
+        constraints.append(
+            And(variables[f"{i}x{j}"] >=0, variables[f"{i}x{j}"] < len(cellTypes.keys()))
+        )
+
+base_rules = And(constraints)
+base_rules = simplify(base_rules)
+solver.add(base_rules)
+solver.push()
+
+print(solver.assertions())
 # endregion
