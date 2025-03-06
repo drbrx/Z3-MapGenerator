@@ -6,54 +6,24 @@
             "isTraversable": false
         },
         {
-            "symbol": " ",
+            "symbol": ".",
             "name": "Free space",
+            "isTraversable": true
+        },
+        {
+            "symbol": "i",
+            "name": "Entrance",
+            "isTraversable": true
+        },
+        {
+            "symbol": "o",
+            "name": "Exit",
             "isTraversable": true
         },
         {
             "symbol": null,
             "name": "Void",
             "isTraversable": false
-        }
-    ],
-    "rooms": [
-        {
-            "name": "VerticalCorridor",
-            "map": [
-                [
-                    "x",
-                    " ",
-                    "x"
-                ]
-            ]
-        },
-        {
-            "name": "CrossCorridor",
-            "map": [
-                [
-                    "x",
-                    " ",
-                    "x"
-                ],
-                [
-                    " ",
-                    " ",
-                    " "
-                ],
-                [
-                    "x",
-                    " ",
-                    "x"
-                ]
-            ]
-        },
-        {
-            "name": "VoidUnit",
-            "map": [
-                [
-                    null
-                ]
-            ]
         }
     ]
 }
