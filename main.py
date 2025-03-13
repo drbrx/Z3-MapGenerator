@@ -19,11 +19,11 @@ for cellType in data["cells"]:
         cellType["name"], cellType["isTraversable"], cellType["symbol"]
     )
 
-ENTRANCE_SYMBOL = "i"
-EXIT_SYMBOL = "o"
-PRINT_VALUES = True
-PRINT_EXIT_DIST = True
-PRINT_BASE_RULES = False
+ENTRANCE_SYMBOL = data["settings"]["entranceSymbol"]
+EXIT_SYMBOL = data["settings"]["exitSymbol"]
+PRINT_VALUES = data["settings"]["printValues"]
+PRINT_EXIT_DIST = data["settings"]["printExitDist"]
+PRINT_BASE_RULES = data["settings"]["printBaseRules"]
 # print(cellTypes)
 
 gridHeight = 0

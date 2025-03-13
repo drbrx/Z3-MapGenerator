@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "args": [
                 "space.map",
-                "cells.json"
+                "config.json"
             ]
         }
     ]
