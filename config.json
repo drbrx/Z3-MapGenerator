@@ -24,8 +24,8 @@
     "settings": {
         "entranceSymbol": "i",
         "exitSymbol": "o",
-        "printValues": true,
-        "printExitDist": true,
+        "printValues": false,
+        "printExitDist": false,
         "printBaseRules": false
     }
 }
