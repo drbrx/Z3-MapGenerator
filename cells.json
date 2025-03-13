@@ -19,11 +19,6 @@
             "symbol": "o",
             "name": "Exit",
             "isTraversable": true
-        },
-        {
-            "symbol": null,
-            "name": "Void",
-            "isTraversable": false
         }
     ]
 }
