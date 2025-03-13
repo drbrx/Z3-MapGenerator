@@ -1,0 +1,24 @@
+{
+    "cells": [
+        {
+            "symbol": "x",
+            "name": "Wall",
+            "isTraversable": false
+        },
+        {
+            "symbol": ".",
+            "name": "Free space",
+            "isTraversable": true
+        },
+        {
+            "symbol": "i",
+            "name": "Entrance",
+            "isTraversable": true
+        },
+        {
+            "symbol": "o",
+            "name": "Exit",
+            "isTraversable": true
+        }
+    ]
+}
