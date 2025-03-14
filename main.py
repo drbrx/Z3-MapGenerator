@@ -34,10 +34,11 @@ grid = []
 with open(sys.argv[1], "r") as file:
     for line in file:
         line = line.rstrip("\n")
-        grid.append([cellTypes[char] for char in line])
-        if gridLength == 0:
-            gridLength = len(line)
-        gridHeight += 1
+        if not (line == "" or line[0] == "#"):
+            grid.append([cellTypes[char] for char in line])
+            if gridLength == 0:
+                gridLength = len(line)
+            gridHeight += 1
 # print(grid)
 
 variables = {}
@@ -251,7 +252,7 @@ if optimizer.check() == sat:
     if PRINT_EXIT_DIST:
         print("Minimum exit distance: " + str(model[variables[f"ExitDist"]]))
 
-    plt.figure(figsize=(12, 4))
+    plt.figure(figsize=(20, 20))
 
     plt.subplot(1, 3, 1)
     plt.imshow(
