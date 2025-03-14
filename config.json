@@ -6,6 +6,11 @@
             "isTraversable": false
         },
         {
+            "symbol": " ",
+            "name": "Void",
+            "isTraversable": false
+        },
+        {
             "symbol": ".",
             "name": "Free space",
             "isTraversable": true

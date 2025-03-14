@@ -8,17 +8,17 @@
 #..xx.xx.x.x
 
 ...........................
-.xxxxxxxxxxxx.xxxxxxxxxxxx.
-.xxxx................xxxxx.
-.xxxx.xxxxxxx.xxxxxx.xxxxx.
-.xxx....xxxx....xxx..xxxxx.
-.xx......xx......xx..xxxxx.
-.x...xxxxx...xxxxxx..xxxxx.
-.x.i.xxxxx...xxxxxx..xxxxx.
-.x...xxxxx...xxxxxx..xxxxx.
-.xx......xx......xx....oxx.
-.xxx....xxxx....xxx.....xx.
-.xxxx.xxxxxxx.xxxxxx.xxxxx.
-.xxxx................xxxxx.
-.xxxxxxxxxxxx.xxxxxxxxxxxx.
+.            .            .
+.    ................     .
+.    .xxxxxxx.xxxxxx.  .  .
+.   ....xxxx....xxx.. ... .
+.  ......xx......xx..  .  .
+. ...xxxxx...xxxxxx..     .
+. .i.xxxxx...xxxxxx..     .
+. ...xxxxx...xxxxxx..     .
+.  ......xx......xx....o  .
+.   ....xxxx....xxx.....  .
+.    .xxxxxxx.xxxxxx.     .
+.    ................     .
+.                         .
 ...........................
