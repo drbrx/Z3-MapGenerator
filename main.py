@@ -23,6 +23,7 @@ for cellType in data["cells"]:
 
 ENTRANCE_SYMBOL = data["settings"]["entranceSymbol"]
 EXIT_SYMBOL = data["settings"]["exitSymbol"]
+
 PRINT_VALUES = data["settings"]["printValues"]
 PRINT_EXIT_DIST = data["settings"]["printExitDist"]
 PRINT_BASE_RULES = data["settings"]["printBaseRules"]
@@ -34,10 +35,11 @@ grid = []
 with open(sys.argv[1], "r") as file:
     for line in file:
         line = line.rstrip("\n")
-        grid.append([cellTypes[char] for char in line])
-        if gridLength == 0:
-            gridLength = len(line)
-        gridHeight += 1
+        if not (line == "" or line[0] == "#"):
+            grid.append([cellTypes[char] for char in line])
+            if gridLength == 0:
+                gridLength = len(line)
+            gridHeight += 1
 # print(grid)
 
 variables = {}
@@ -45,8 +47,7 @@ constraints = []
 # endregion
 
 # region solver rule setup
-
-# init variables first to allow referencing
+# init variables first to allow referencing them while setting constraints
 for i in range(gridHeight):
     for j in range(gridLength):
         variables[f"{i}x{j}_Cell"] = Int(f"{i}x{j}_Cell")
@@ -95,7 +96,7 @@ for i in range(gridHeight):
             else:
                 constraints.append(variables[f"{i}x{j}_Adj3"] == False)
             # endregion
-            # generate specific constraints
+            # set specific constraints for each adjacent cell
             for adj in list(adjCells.keys()):
                 constraints.append(
                     Implies(
@@ -144,7 +145,7 @@ for i in range(gridHeight):
             )
         )
 
-        # accept only exactly one entrance and one exit
+        # accept only exactly one entrance and one exit: enforce map rules
         constraints.append(
             And(
                 Sum(
@@ -251,31 +252,80 @@ if optimizer.check() == sat:
     if PRINT_EXIT_DIST:
         print("Minimum exit distance: " + str(model[variables[f"ExitDist"]]))
 
-    plt.figure(figsize=(12, 4))
+    # region plot visuals
+    plt.figure(figsize=(20, 20))
 
+    #plot generic map
     plt.subplot(1, 3, 1)
     plt.imshow(
         [
-            [model[variables[f"{i}x{j}_Cell"]].as_long() for j in range(gridLength)]
-            for i in range(gridHeight)
-        ],
-        cmap="viridis",
-    )
-    plt.title("Map")
-    plt.axis("off")
-    plt.subplot(1, 3, 2)
-    plt.imshow(
-        [
             [
-                2 if is_true(model[variables[f"{i}x{j}_Trav"]]) else 0
+                (
+                    5
+                    if model[variables[f"{i}x{j}_Cell"]].as_long()
+                    == list(cellTypes.keys()).index(ENTRANCE_SYMBOL)
+                    else (
+                        10
+                        if model[variables[f"{i}x{j}_Cell"]].as_long()
+                        == list(cellTypes.keys()).index(EXIT_SYMBOL)
+                        else model[variables[f"{i}x{j}_Cell"]].as_long() * 20
+                    )
+                )
                 for j in range(gridLength)
             ]
             for i in range(gridHeight)
         ],
-        cmap="plasma",
+        cmap="inferno",
+    )
+    plt.title("Map")
+    plt.axis("off")
+    for i in range(gridHeight):
+        for j in range(gridLength):
+            plt.text(
+                j,
+                i,
+                (
+                    "IN"
+                    if model[variables[f"{i}x{j}_Cell"]].as_long()
+                    == list(cellTypes.keys()).index(ENTRANCE_SYMBOL)
+                    else (
+                        "OUT"
+                        if model[variables[f"{i}x{j}_Cell"]].as_long()
+                        == list(cellTypes.keys()).index(EXIT_SYMBOL)
+                        else ""
+                    )
+                ),
+                ha="center",
+                va="center",
+                color=("white"),
+            )
+
+    #plot access map
+    plt.subplot(1, 3, 2)
+    plt.imshow(
+        [
+            [
+                5 if is_true(model[variables[f"{i}x{j}_Trav"]]) else -10
+                for j in range(gridLength)
+            ]
+            for i in range(gridHeight)
+        ],
+        cmap="inferno",
     )
     plt.title("Traversability")
     plt.axis("off")
+    for i in range(gridHeight):
+        for j in range(gridLength):
+            plt.text(
+                j,
+                i,
+                ("" if is_true(model[variables[f"{i}x{j}_Trav"]]) else "X"),
+                ha="center",
+                va="center",
+                color="red",
+            )
+
+    #plot distance map
     plt.subplot(1, 3, 3)
     img = plt.imshow(
         [
@@ -305,15 +355,17 @@ if optimizer.check() == sat:
                 ),
                 ha="center",
                 va="center",
-                color=(
-                    "white"
-                    if model[variables[f"{i}x{j}_ReachDist"]].as_long() < 12
-                    else "black"
+                color=("white"),
+                bbox=dict(
+                    facecolor=(0, 0, 0, 0.25),
+                    edgecolor="none",
+                    boxstyle="round,pad=0.3",
                 ),
             )
 
     plt.tight_layout()
     plt.show()
+    #endregion
 else:
     print("Unsat")
 # endregion
