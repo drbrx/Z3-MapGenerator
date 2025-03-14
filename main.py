@@ -23,6 +23,7 @@ for cellType in data["cells"]:
 
 ENTRANCE_SYMBOL = data["settings"]["entranceSymbol"]
 EXIT_SYMBOL = data["settings"]["exitSymbol"]
+
 PRINT_VALUES = data["settings"]["printValues"]
 PRINT_EXIT_DIST = data["settings"]["printExitDist"]
 PRINT_BASE_RULES = data["settings"]["printBaseRules"]
@@ -46,8 +47,7 @@ constraints = []
 # endregion
 
 # region solver rule setup
-
-# init variables first to allow referencing
+# init variables first to allow referencing them while setting constraints
 for i in range(gridHeight):
     for j in range(gridLength):
         variables[f"{i}x{j}_Cell"] = Int(f"{i}x{j}_Cell")
@@ -96,7 +96,7 @@ for i in range(gridHeight):
             else:
                 constraints.append(variables[f"{i}x{j}_Adj3"] == False)
             # endregion
-            # generate specific constraints
+            # set specific constraints for each adjacent cell
             for adj in list(adjCells.keys()):
                 constraints.append(
                     Implies(
@@ -145,7 +145,7 @@ for i in range(gridHeight):
             )
         )
 
-        # accept only exactly one entrance and one exit
+        # accept only exactly one entrance and one exit: enforce map rules
         constraints.append(
             And(
                 Sum(
@@ -252,8 +252,10 @@ if optimizer.check() == sat:
     if PRINT_EXIT_DIST:
         print("Minimum exit distance: " + str(model[variables[f"ExitDist"]]))
 
+    # region plot visuals
     plt.figure(figsize=(20, 20))
 
+    #plot generic map
     plt.subplot(1, 3, 1)
     plt.imshow(
         [
@@ -298,6 +300,7 @@ if optimizer.check() == sat:
                 color=("white"),
             )
 
+    #plot access map
     plt.subplot(1, 3, 2)
     plt.imshow(
         [
@@ -322,6 +325,7 @@ if optimizer.check() == sat:
                 color="red",
             )
 
+    #plot distance map
     plt.subplot(1, 3, 3)
     img = plt.imshow(
         [
@@ -361,6 +365,7 @@ if optimizer.check() == sat:
 
     plt.tight_layout()
     plt.show()
+    #endregion
 else:
     print("Unsat")
 # endregion
