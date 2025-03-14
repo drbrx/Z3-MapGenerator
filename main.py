@@ -256,26 +256,71 @@ if optimizer.check() == sat:
     plt.subplot(1, 3, 1)
     plt.imshow(
         [
-            [model[variables[f"{i}x{j}_Cell"]].as_long() for j in range(gridLength)]
-            for i in range(gridHeight)
-        ],
-        cmap="viridis",
-    )
-    plt.title("Map")
-    plt.axis("off")
-    plt.subplot(1, 3, 2)
-    plt.imshow(
-        [
             [
-                2 if is_true(model[variables[f"{i}x{j}_Trav"]]) else 0
+                (
+                    5
+                    if model[variables[f"{i}x{j}_Cell"]].as_long()
+                    == list(cellTypes.keys()).index(ENTRANCE_SYMBOL)
+                    else (
+                        10
+                        if model[variables[f"{i}x{j}_Cell"]].as_long()
+                        == list(cellTypes.keys()).index(EXIT_SYMBOL)
+                        else model[variables[f"{i}x{j}_Cell"]].as_long() * 20
+                    )
+                )
                 for j in range(gridLength)
             ]
             for i in range(gridHeight)
         ],
-        cmap="plasma",
+        cmap="inferno",
+    )
+    plt.title("Map")
+    plt.axis("off")
+    for i in range(gridHeight):
+        for j in range(gridLength):
+            plt.text(
+                j,
+                i,
+                (
+                    "IN"
+                    if model[variables[f"{i}x{j}_Cell"]].as_long()
+                    == list(cellTypes.keys()).index(ENTRANCE_SYMBOL)
+                    else (
+                        "OUT"
+                        if model[variables[f"{i}x{j}_Cell"]].as_long()
+                        == list(cellTypes.keys()).index(EXIT_SYMBOL)
+                        else ""
+                    )
+                ),
+                ha="center",
+                va="center",
+                color=("white"),
+            )
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(
+        [
+            [
+                5 if is_true(model[variables[f"{i}x{j}_Trav"]]) else -10
+                for j in range(gridLength)
+            ]
+            for i in range(gridHeight)
+        ],
+        cmap="inferno",
     )
     plt.title("Traversability")
     plt.axis("off")
+    for i in range(gridHeight):
+        for j in range(gridLength):
+            plt.text(
+                j,
+                i,
+                ("" if is_true(model[variables[f"{i}x{j}_Trav"]]) else "X"),
+                ha="center",
+                va="center",
+                color="red",
+            )
+
     plt.subplot(1, 3, 3)
     img = plt.imshow(
         [
@@ -305,10 +350,11 @@ if optimizer.check() == sat:
                 ),
                 ha="center",
                 va="center",
-                color=(
-                    "white"
-                    if model[variables[f"{i}x{j}_ReachDist"]].as_long() < 12
-                    else "black"
+                color=("white"),
+                bbox=dict(
+                    facecolor=(0, 0, 0, 0.25),
+                    edgecolor="none",
+                    boxstyle="round,pad=0.3",
                 ),
             )
 
