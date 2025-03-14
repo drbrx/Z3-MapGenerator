@@ -11,8 +11,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "space.map",
-                "cells.json"
+                "example.map",
+                "config.json"
             ]
         }
     ]

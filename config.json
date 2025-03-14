@@ -20,5 +20,12 @@
             "name": "Exit",
             "isTraversable": true
         }
-    ]
+    ],
+    "settings": {
+        "entranceSymbol": "i",
+        "exitSymbol": "o",
+        "printValues": false,
+        "printExitDist": false,
+        "printBaseRules": false
+    }
 }

@@ -2,6 +2,8 @@
 
 import random
 from z3 import *
+import numpy as np
+import matplotlib.pyplot as plt
 import json
 
 from cell import Cell
@@ -19,11 +21,11 @@ for cellType in data["cells"]:
         cellType["name"], cellType["isTraversable"], cellType["symbol"]
     )
 
-ENTRANCE_SYMBOL = "i"
-EXIT_SYMBOL = "o"
-PRINT_VALUES = True
-PRINT_EXIT_DIST = True
-PRINT_BASE_RULES = False
+ENTRANCE_SYMBOL = data["settings"]["entranceSymbol"]
+EXIT_SYMBOL = data["settings"]["exitSymbol"]
+PRINT_VALUES = data["settings"]["printValues"]
+PRINT_EXIT_DIST = data["settings"]["printExitDist"]
+PRINT_BASE_RULES = data["settings"]["printBaseRules"]
 # print(cellTypes)
 
 gridHeight = 0
@@ -248,6 +250,70 @@ if optimizer.check() == sat:
 
     if PRINT_EXIT_DIST:
         print("Minimum exit distance: " + str(model[variables[f"ExitDist"]]))
+
+    plt.figure(figsize=(12, 4))
+
+    plt.subplot(1, 3, 1)
+    plt.imshow(
+        [
+            [model[variables[f"{i}x{j}_Cell"]].as_long() for j in range(gridLength)]
+            for i in range(gridHeight)
+        ],
+        cmap="viridis",
+    )
+    plt.title("Map")
+    plt.axis("off")
+    plt.subplot(1, 3, 2)
+    plt.imshow(
+        [
+            [
+                2 if is_true(model[variables[f"{i}x{j}_Trav"]]) else 0
+                for j in range(gridLength)
+            ]
+            for i in range(gridHeight)
+        ],
+        cmap="plasma",
+    )
+    plt.title("Traversability")
+    plt.axis("off")
+    plt.subplot(1, 3, 3)
+    img = plt.imshow(
+        [
+            [
+                (
+                    model[variables[f"{i}x{j}_ReachDist"]].as_long() * 2
+                    if model[variables[f"{i}x{j}_ReachDist"]].as_long() >= 0
+                    else -10
+                )
+                for j in range(gridLength)
+            ]
+            for i in range(gridHeight)
+        ],
+        cmap="inferno",
+    )
+    plt.title("Reachability")
+    plt.axis("off")
+    for i in range(gridHeight):
+        for j in range(gridLength):
+            plt.text(
+                j,
+                i,
+                (
+                    f"{model[variables[f"{i}x{j}_ReachDist"]].as_long()}"
+                    if model[variables[f"{i}x{j}_ReachDist"]].as_long() >= 0
+                    else ""
+                ),
+                ha="center",
+                va="center",
+                color=(
+                    "white"
+                    if model[variables[f"{i}x{j}_ReachDist"]].as_long() < 12
+                    else "black"
+                ),
+            )
+
+    plt.tight_layout()
+    plt.show()
 else:
     print("Unsat")
 # endregion
