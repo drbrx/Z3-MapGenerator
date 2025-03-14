@@ -15,4 +15,5 @@ Example (valid for the offered demo settings):  python main.py example.map confi
 Exacly one entrance and exactly one exit are expected. These must be defined in the settings file.
 The map must be rectangular. Larger maps impact performance but are still supported.
 Any amount of cell types is supported, but larger amounts will somewhat impact performance.
-The map may contain empty lines and comments (lines starting with #). These will be fully ignored when the map is loaded
+The map may contain empty lines and comments (lines starting with #). These will be fully ignored when the map is loaded.
+Both numpy and matplotlib are required dependencies for the project to function.
