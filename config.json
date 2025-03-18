@@ -30,7 +30,8 @@
         "entranceSymbol": "i",
         "exitSymbol": "o",
         "printValues": false,
-        "printExitDist": true,
-        "printBaseRules": false
+        "printExitDist": false,
+        "printBaseRules": false,
+        "printGoals": false
     }
 }
