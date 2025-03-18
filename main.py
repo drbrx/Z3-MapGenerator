@@ -23,10 +23,13 @@ for cellType in data["cells"]:
 
 ENTRANCE_SYMBOL = data["settings"]["entranceSymbol"]
 EXIT_SYMBOL = data["settings"]["exitSymbol"]
+MAX_RANGE = int(sys.argv[3])
 
 PRINT_VALUES = data["settings"]["printValues"]
 PRINT_EXIT_DIST = data["settings"]["printExitDist"]
 PRINT_BASE_RULES = data["settings"]["printBaseRules"]
+PRINT_GOALS = data["settings"]["printGoals"]
+
 # print(cellTypes)
 
 gridHeight = 0
@@ -44,6 +47,7 @@ with open(sys.argv[1], "r") as file:
 
 variables = {}
 constraints = []
+goals = []
 # endregion
 
 # region solver rule setup
@@ -53,8 +57,8 @@ for i in range(gridHeight):
         variables[f"{i}x{j}_Cell"] = Int(f"{i}x{j}_Cell")
         variables[f"{i}x{j}_Trav"] = Bool(f"{i}x{j}_Trav")
         variables[f"{i}x{j}_ReachDist"] = Int(f"{i}x{j}_ReachDist")
-if PRINT_EXIT_DIST:
-    variables["ExitDist"] = Int("ExitDist")
+variables["ExitDist"] = Int("ExitDist")
+variables["MaxDistValid"] = Bool("MaxDistValid")
 
 # define grid and base properties
 for i in range(gridHeight):
@@ -186,29 +190,30 @@ for i in range(gridHeight):
         )
 
         # goal: exit is reachable
-        constraints.append(
+        goals.append(
             Implies(
                 variables[f"{i}x{j}_Cell"] == list(cellTypes.keys()).index(EXIT_SYMBOL),
                 variables[f"{i}x{j}_ReachDist"] > -1,
             ),
         )
-        # store dist if needed
-        if PRINT_EXIT_DIST:
-            constraints.append(
-                Implies(
-                    variables[f"{i}x{j}_Cell"]
-                    == list(cellTypes.keys()).index(EXIT_SYMBOL),
-                    variables["ExitDist"] == variables[f"{i}x{j}_ReachDist"],
-                )
+        # store dist
+        constraints.append(
+            Implies(
+                variables[f"{i}x{j}_Cell"] == list(cellTypes.keys()).index(EXIT_SYMBOL),
+                variables["ExitDist"] == variables[f"{i}x{j}_ReachDist"],
             )
+        )
+
 # endregion
 
 # region declare objective
+# optional goal: exit within range
+goals.append(
+    variables["MaxDistValid"] == (variables[f"ExitDist"] <= MAX_RANGE),
+)
 
 optimizer = Optimize()
-base_rules = And(constraints)
-base_rules = simplify(base_rules)
-optimizer.add(base_rules)
+optimizer.add(simplify(And(constraints)))
 optimizer.push()
 
 # goal: explore as much of the map as possible
@@ -231,10 +236,12 @@ optimizer.minimize(
 if PRINT_BASE_RULES:
     for c in constraints:
         print(c)
+if PRINT_GOALS:
+    for g in goals:
+        print(g)
 
 if optimizer.check() == sat:
     model = optimizer.model()
-    print("Sat")
 
     if PRINT_VALUES:
         suffixes = ["_Cell", "_Trav", "_ReachDist"]
@@ -253,11 +260,10 @@ if optimizer.check() == sat:
         print("Minimum exit distance: " + str(model[variables[f"ExitDist"]]))
 
     # region plot visuals
-    plt.figure(figsize=(20, 20))
+    img, plots = plt.subplots(2, 2, figsize=(20, 20))
 
-    #plot generic map
-    plt.subplot(1, 3, 1)
-    plt.imshow(
+    # plot generic map
+    plots[0, 0].imshow(
         [
             [
                 (
@@ -277,11 +283,11 @@ if optimizer.check() == sat:
         ],
         cmap="inferno",
     )
-    plt.title("Map")
-    plt.axis("off")
+    plots[0, 0].set_title("Map")
+    plots[0, 0].axis("off")
     for i in range(gridHeight):
         for j in range(gridLength):
-            plt.text(
+            plots[0, 0].text(
                 j,
                 i,
                 (
@@ -300,9 +306,8 @@ if optimizer.check() == sat:
                 color=("white"),
             )
 
-    #plot access map
-    plt.subplot(1, 3, 2)
-    plt.imshow(
+    # plot access map
+    plots[0, 1].imshow(
         [
             [
                 5 if is_true(model[variables[f"{i}x{j}_Trav"]]) else -10
@@ -312,11 +317,11 @@ if optimizer.check() == sat:
         ],
         cmap="inferno",
     )
-    plt.title("Traversability")
-    plt.axis("off")
+    plots[0, 1].set_title("Traversability")
+    plots[0, 1].axis("off")
     for i in range(gridHeight):
         for j in range(gridLength):
-            plt.text(
+            plots[0, 1].text(
                 j,
                 i,
                 ("" if is_true(model[variables[f"{i}x{j}_Trav"]]) else "X"),
@@ -325,9 +330,8 @@ if optimizer.check() == sat:
                 color="red",
             )
 
-    #plot distance map
-    plt.subplot(1, 3, 3)
-    img = plt.imshow(
+    # plot distance map
+    plots[1, 0].imshow(
         [
             [
                 (
@@ -341,11 +345,11 @@ if optimizer.check() == sat:
         ],
         cmap="inferno",
     )
-    plt.title("Reachability")
-    plt.axis("off")
+    plots[1, 0].set_title("Reachability")
+    plots[1, 0].axis("off")
     for i in range(gridHeight):
         for j in range(gridLength):
-            plt.text(
+            plots[1, 0].text(
                 j,
                 i,
                 (
@@ -355,17 +359,52 @@ if optimizer.check() == sat:
                 ),
                 ha="center",
                 va="center",
-                color=("white"),
+                color=(
+                    "white"
+                    if model[variables[f"{i}x{j}_ReachDist"]].as_long() <= MAX_RANGE
+                    else "red"
+                ),
                 bbox=dict(
-                    facecolor=(0, 0, 0, 0.25),
+                    facecolor=(
+                        (0, 0, 0, 0.25)
+                        if model[variables[f"{i}x{j}_ReachDist"]].as_long() <= MAX_RANGE
+                        else (1, 1, 1, 0.25)
+                    ),
                     edgecolor="none",
                     boxstyle="round,pad=0.3",
                 ),
             )
 
-    plt.tight_layout()
+    plots[1, 1].set_title("Results")
+    img.delaxes(plots[1, 1])
+
+    # show results
+    optimizer.add(simplify(And(goals)))
+    res_text = "The exit is NOT reachable"
+    if optimizer.check() == sat:
+        res_model = optimizer.model()
+        if PRINT_EXIT_DIST:
+            print(
+                "Is exit within range: "
+                + str(is_true(model[variables[f"MaxDistValid"]]))
+            )
+        if res_model[variables["ExitDist"]].as_long() >= 0:
+            res_text = f"The exit IS reachable, with a minimum distance of {res_model[variables["ExitDist"]].as_long()} steps\nThis is {"WITHIN" if is_true(res_model[variables[f"MaxDistValid"]]) else "OUTSIDE"} the maximum accepted range of {MAX_RANGE}"
+    img.text(
+        0.75,
+        0.25,
+        res_text,
+        fontsize=14,
+        bbox=dict(facecolor="white", edgecolor="white", boxstyle="square,pad=0.5"),
+        ha="center",
+        va="center",
+    )
+
+    plt.subplots_adjust(
+        left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.2, hspace=0.2
+    )
     plt.show()
-    #endregion
+    # endregion
 else:
     print("Unsat")
 # endregion
