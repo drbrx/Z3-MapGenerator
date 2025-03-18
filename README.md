@@ -1,6 +1,6 @@
 # Usage:
 
-The script must be run with exactly the 2 following arguments (in this order):
+The script must be run with exactly the 3 following arguments (in this order):
 
 -path to the map file
 
