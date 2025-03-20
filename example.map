@@ -1,3 +1,4 @@
+#basic small
 x..xxxx...o
 .x...xx.xx.
 x..x.......
@@ -7,6 +8,7 @@ x...     .x
 x.......x.x
 ..xx.xx.x.x
 
+#unsat
 #x..xxxx.. o
 #.x...xx.xx 
 #x..x.......
@@ -16,6 +18,28 @@ x.......x.x
 #x.......x.x
 #..xx.xx.x.x
 
+#large map
+#ixxxxxx............x
+#. xxxxxxxxx.xxxxxx.x
+#. x......xx.x....x.x
+#. x.x.  .xx.xxxx.x.x
+#. x.x.  .......x.x.x
+#. xxx.  .xxxxx.....x
+#.........xx....xxxxx
+#xxxxxxxx.xxx.xxxxxxx
+#x.x......xxx.xx....x
+#x.xxxxxx.xxx.xx.xx.x
+#x.x......xx...x.xx.x
+#x.xxxxxx.xx. .x.x...
+#x.x......xx. .x.x. .
+#x.xxx.xx.... ...x...
+#x.xxx.xxxxx. .xxx. .
+#x.xxx.....x. .xxx...
+#x.xxxxxxx.x...xxx. .
+#x.........xx.xxxx...
+#xxxxxxxxxxxx.    ..o
+
+#visuals demo
 #...........................
 #.            .            .
 #.    ................     .
