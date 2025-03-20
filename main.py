@@ -21,16 +21,15 @@ for cellType in data["cells"]:
         cellType["name"], cellType["isTraversable"], cellType["symbol"]
     )
 
+#load map config
 ENTRANCE_SYMBOL = data["settings"]["entranceSymbol"]
 EXIT_SYMBOL = data["settings"]["exitSymbol"]
 MAX_RANGE = int(sys.argv[3])
-
+#load debug config
 PRINT_VALUES = data["settings"]["printValues"]
 PRINT_EXIT_DIST = data["settings"]["printExitDist"]
 PRINT_BASE_RULES = data["settings"]["printBaseRules"]
 PRINT_GOALS = data["settings"]["printGoals"]
-
-# print(cellTypes)
 
 gridHeight = 0
 gridLength = 0
@@ -43,7 +42,6 @@ with open(sys.argv[1], "r") as file:
             if gridLength == 0:
                 gridLength = len(line)
             gridHeight += 1
-# print(grid)
 
 variables = {}
 constraints = []
